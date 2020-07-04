@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"io/ioutil"
 	"io"
-
+	"flag"
 	"gython/internal/util"
 )
 
@@ -62,8 +63,8 @@ func Parse() CommandLineOptions {
 }
 
 
-func Menu(status Status) Status {
-	var fullHelp bool = (status == OK)
+func Menu(status int) int {
+	var fullHelp bool = (status == 0)
 	var f io.Writer
 	if fullHelp {
 		f = os.Stdout
@@ -77,26 +78,33 @@ func Menu(status Status) Status {
 	return status
 }
 
+func evalLineByLine() {
+	return
+}
 
 /*
 MAIN main mAiN
 */
 func main() {
 	fmt.Println("Welcome to Gython")
-	var opts CommandLineOptions = Parse()
+	cliFlag := flag.Bool("cli", false, "Run Python CLI prompt.")
+	pythonFileFlag := flag.String("file", "", "Python *.py file to run.")
+	flag.Parse()
 
-	switch opts.Action {
-	case VERSION :
-		fmt.Fprint(os.Stderr, "Gython", version.PY_VERSION)
-		os.Exit(OK)
-	case HELP:
-		os.Exit(Menu(OK))
-	case ERROR_OUT:
-		fmt.Fprint(os.Stderr, opts.Message)
-	case RUN:
+	if *cliFlag == true {
+		evalLineByLine()
+		// eventually (hopefully) this should just do the same thing as the file
+		// i.e. treat each new line as being appended to the "file" so we can define a function
+		// with multiple lines or something instead of each line being fully atomic
+	} else if (true) { // if file exists(*pythonFileFlag)
+		// check that file is a .py file (and first that it exists)
+		// read contents to this variable and build AST from that
+		var fileContents, err = ioutil.ReadFile("")
+		if err != nil {
+			fmt.Println("Error reading file ", *pythonFileFlag, ". Exiting.")
+			os.Exit(2)
+		}
+		fmt.Println(fileContents)
 	}
-
-	
-
 
 }
